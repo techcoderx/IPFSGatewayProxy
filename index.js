@@ -20,10 +20,7 @@ app.all('/ipfs/*', (req,res) => {
         res.writeHead(404);
         return res.end();
     }
-    Shell.exec('ipfs pin ls -t recursive',{silent: true},(code,stdout,stderr) => {
-        if (stderr != '') 
-            console.log('\n\nError: ' + stderr);
-        
+    Shell.exec('ipfs pin ls -t recursive',{silent: true},(code,stdout) => {
         if (stdout.includes(hash)) {
             ProxyAPI.web(req,res,{target: IPFSGateway});
         } else {
