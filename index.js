@@ -1,11 +1,14 @@
+const args = require('minimist')(process.argv.slice(2));
 const Express = require('express');
 const Proxy = require('http-proxy');
 const Shell = require('shelljs');
 const app = Express();
 const ProxyAPI = Proxy.createProxyServer();
-const Config = {
-    IPFSGateway: 'http://localhost:8080',
-    Port: 3000
+const IPFSGateway = 'http://localhost:8080';
+
+if (!Number.isInteger(args['port']) && args['port'] != undefined) {
+    console.log('Error: port specified is not an integer!');
+    return process.exit(1);
 }
 
 app.all('/ipfs/*', (req,res) => {
@@ -19,7 +22,7 @@ app.all('/ipfs/*', (req,res) => {
             console.log('\n\nError: ' + stderr);
         
         if (stdout.includes(hash)) {
-            ProxyAPI.web(req,res,{target: Config.IPFSGateway});
+            ProxyAPI.web(req,res,{target: IPFSGateway});
         } else {
             res.writeHead(404);
             res.end();
@@ -27,6 +30,6 @@ app.all('/ipfs/*', (req,res) => {
     })
 });
 
-ProxyAPI.on('error',(err) => console.log(error));
+ProxyAPI.on('error',(err) => console.log(err));
 
-app.listen(Config.Port);
+app.listen(args['port'] || 3000);
