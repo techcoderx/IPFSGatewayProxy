@@ -11,7 +11,7 @@ git clone https://github.com/techcoderx/IPFSGatewayProxy.git
 
 2. Install required node modules
 ```
-npm install
+cd IPFSGatewayProxy && npm install
 ```
 
 3. Run the app.
