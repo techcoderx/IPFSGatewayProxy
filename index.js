@@ -2,7 +2,7 @@ const args = require('minimist')(process.argv.slice(2));
 const Express = require('express');
 const CORS = require('cors');
 const Proxy = require('http-proxy');
-const Shell = require('shelljs');
+const IPFS = require('ipfs-http-client')('localhost',5001,{protocol: 'http'})
 const app = Express();
 const ProxyAPI = Proxy.createProxyServer();
 const IPFSGateway = 'http://localhost:8080';
@@ -20,12 +20,12 @@ app.all('/ipfs/*', (req,res) => {
         res.writeHead(404);
         return res.end();
     }
-    Shell.exec('ipfs pin ls -t recursive',{silent: true},(code,stdout) => {
-        if (stdout.includes(hash)) {
-            ProxyAPI.web(req,res,{target: IPFSGateway});
+    IPFS.pin.ls(hash,{type: 'recursive'},(err) => {
+        if (err != null) {
+            res.writeHead(404)
+            return res.end()
         } else {
-            res.writeHead(404);
-            res.end();
+            ProxyAPI.web(req,res,{target: IPFSGateway});
         }
     })
 });
